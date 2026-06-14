@@ -1,205 +1,233 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Jithu Adventure Quest 🌍</title>
+<title>Jithu RPG</title>
 
 <style>
 body{
 margin:0;
-background:#000;
-color:white;
+background:#0b0b0f;
 font-family:Arial;
+color:white;
 display:flex;
 justify-content:center;
 align-items:center;
 height:100vh;
-text-align:center;
 }
 
-.screen{ display:none; }
-.active{ display:block; }
+/* MOBILE SCREEN */
+.phone{
+width:360px;
+height:640px;
+background:#111;
+border-radius:25px;
+box-shadow:0 0 30px rgba(0,0,0,0.8);
+overflow:hidden;
+position:relative;
+}
 
-button{
-margin:8px;
-padding:12px 18px;
-border:1px solid white;
-background:transparent;
-color:white;
+/* TOP BAR */
+.top{
+background:#1c1c2a;
+padding:10px;
+display:flex;
+justify-content:space-between;
+font-size:14px;
+}
+
+/* CONTENT */
+.screen{
+display:none;
+padding:15px;
+}
+
+.active{
+display:block;
+}
+
+/* CARDS */
+.card{
+background:#222;
+padding:15px;
+border-radius:12px;
+margin:10px 0;
 cursor:pointer;
 transition:0.3s;
 }
 
-button:hover{
-background:white;
+.card:hover{
+background:#333;
+transform:scale(1.02);
+}
+
+/* BUTTON */
+button{
+margin-top:10px;
+padding:10px;
+width:100%;
+border:none;
+border-radius:10px;
+background:#ffcc00;
 color:black;
+font-weight:bold;
+cursor:pointer;
 }
 
-.box{
-max-width:650px;
-padding:20px;
+/* BOTTOM NAV */
+.nav{
+position:absolute;
+bottom:0;
+width:100%;
+display:flex;
+background:#1c1c2a;
 }
 
-.stat{
-position:fixed;
-top:10px;
-left:10px;
-font-size:14px;
-color:#aaa;
+.nav button{
+flex:1;
+border:none;
+padding:10px;
+background:transparent;
+color:white;
+font-size:12px;
+}
+
+.nav button:hover{
+background:#333;
 }
 </style>
 </head>
 
 <body>
 
-<div class="stat" id="stats">❤️ HP: 100 | 💰 Coins: 0 | ⚔️ Level: 1</div>
+<div class="phone">
 
-<!-- 🌍 START -->
-<div id="start" class="screen active">
-  <div class="box">
-    <h1>🌍 Jithu Adventure Quest</h1>
-    <p>A dangerous journey begins...</p>
-    <button onclick="start()">START</button>
+<!-- TOP -->
+<div class="top">
+<div>💙 JITHU RPG</div>
+<div id="stats">❤️100 💰0 ⚔️1</div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <h3>🌍 Mission Hub</h3>
+
+  <div class="card" onclick="startMission('Forest','🐺 Wolf appears in forest!')">
+    🌲 Forest
+  </div>
+
+  <div class="card" onclick="startMission('Cave','🕳️ Dark monster inside cave!')">
+    🕳️ Cave
+  </div>
+
+  <div class="card" onclick="startMission('Lake','🌊 Water beast rises!')">
+    🌊 Lake
+  </div>
+
+  <div class="card" onclick="boss()">
+    👹 Boss Fight
   </div>
 </div>
 
-<!-- 🗺️ MAP -->
-<div id="map" class="screen">
-  <div class="box">
-    <h2>🗺️ Choose Your Path</h2>
+<!-- BATTLE -->
+<div id="battle" class="screen">
+  <h3 id="title">Battle</h3>
+  <p id="story">Enemy appears</p>
 
-    <button onclick="forest()">🌲 Forest</button>
-    <button onclick="cave()">🕳️ Cave</button>
-    <button onclick="lake()">🌊 Lake</button>
-    <button onclick="boss()">👹 Final Boss</button>
-  </div>
+  <button onclick="attack()">⚔️ ATTACK</button>
+  <button onclick="run()">🏃 RUN</button>
+
+  <p id="result"></p>
 </div>
 
-<!-- 🎮 GAME -->
-<div id="game" class="screen">
-  <div class="box">
-    <h2 id="title">Area</h2>
-    <p id="story">Story</p>
-
-    <button onclick="fight()">⚔️ Fight</button>
-    <button onclick="run()">🏃 Run</button>
-
-    <p id="result"></p>
-
-    <button onclick="goMap()">⬅ Back to Map</button>
-  </div>
-</div>
-
-<!-- 🏆 END -->
+<!-- END -->
 <div id="end" class="screen">
-  <div class="box">
-    <h1>🏆 ADVENTURE COMPLETE</h1>
-    <p id="final"></p>
-    <button onclick="restart()">Play Again</button>
-  </div>
+  <h3>🏆 Mission Complete</h3>
+  <p id="final"></p>
+  <button onclick="restart()">Play Again</button>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button onclick="go('home')">🏠 Home</button>
+  <button onclick="go('battle')">⚔️ Battle</button>
+</div>
+
 </div>
 
 <script>
 
 let hp = 100;
 let coins = 0;
-let level = 1;
-let currentArea = "";
+let lvl = 1;
+let enemy = "";
 
-/* SCREEN CONTROL */
-function show(id){
-document.querySelectorAll(".screen").forEach(s=>{
-s.classList.remove("active");
-});
-document.getElementById(id).classList.add("active");
+/* SCREEN SWITCH */
+function go(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+update();
 }
 
-/* START */
-function start(){
-show("map");
+/* START MISSION */
+function startMission(name,text){
+enemy=name;
+go('battle');
+document.getElementById("title").innerText=name;
+document.getElementById("story").innerText=text;
+document.getElementById("result").innerText="";
 }
 
-/* AREAS */
-function forest(){
-currentArea="Forest";
-startArea("🌲 A wild wolf appears in the forest!");
-}
-
-function cave(){
-currentArea="Cave";
-startArea("🕳️ A dark monster is hiding in the cave!");
-}
-
-function lake(){
-currentArea="Lake";
-startArea("🌊 A water beast rises from the lake!");
-}
-
+/* BOSS */
 function boss(){
-currentArea="Boss";
-startArea("👹 FINAL BOSS: Shadow King appears!");
+enemy="Boss";
+go('battle');
+document.getElementById("title").innerText="👹 Shadow King";
+document.getElementById("story").innerText="Final Boss appears!";
 }
 
-/* START AREA */
-function startArea(text){
-show("game");
-document.getElementById("title").innerText = currentArea;
-document.getElementById("story").innerText = text;
-document.getElementById("result").innerText = "";
-}
+/* ATTACK */
+function attack(){
 
-/* FIGHT */
-function fight(){
-
-if(currentArea==="Boss"){
-hp -= 40;
+if(enemy==="Boss"){
+hp -= 30;
 coins += 50;
-level += 2;
+lvl += 2;
 endGame();
 return;
 }
 
-hp -= 20;
+hp -= 15;
 coins += 10;
-level++;
+lvl++;
 
-document.getElementById("result").innerText =
-"⚔️ You fought bravely! +coins earned";
-updateStats();
+document.getElementById("result").innerText="⚔️ Hit enemy!";
+update();
 }
 
 /* RUN */
 function run(){
 hp -= 5;
-document.getElementById("result").innerText =
-"🏃 You escaped safely!";
-updateStats();
-}
-
-/* MAP */
-function goMap(){
-show("map");
-}
-
-/* UPDATE */
-function updateStats(){
-document.getElementById("stats").innerText =
-`❤️ HP: ${hp} | 💰 Coins: ${coins} | ⚔️ Level: ${level}`;
+document.getElementById("result").innerText="🏃 Escaped!";
+update();
 }
 
 /* END */
 function endGame(){
-show("end");
+go('end');
 document.getElementById("final").innerHTML =
-`Coins: ${coins}<br>Level: ${level}<br>HP: ${hp}`;
+`Coins: ${coins}<br>Level: ${lvl}<br>HP: ${hp}`;
 }
 
 /* RESTART */
 function restart(){
-hp=100;
-coins=0;
-level=1;
-show("map");
-updateStats();
+hp=100; coins=0; lvl=1;
+go('home');
+}
+
+/* UPDATE STATS */
+function update(){
+document.getElementById("stats").innerText =
+`❤️${hp} 💰${coins} ⚔️${lvl}`;
 }
 
 </script>
