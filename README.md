@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Jithu Hero Quest 💙</title>
+<title>Jithu Adventure Quest 🌍</title>
 
 <style>
 body{
 margin:0;
-background:black;
+background:#000;
 color:white;
 font-family:Arial;
 display:flex;
@@ -20,12 +20,13 @@ text-align:center;
 .active{ display:block; }
 
 button{
-margin:10px;
-padding:12px 20px;
+margin:8px;
+padding:12px 18px;
 border:1px solid white;
 background:transparent;
 color:white;
 cursor:pointer;
+transition:0.3s;
 }
 
 button:hover{
@@ -34,75 +35,77 @@ color:black;
 }
 
 .box{
-max-width:600px;
+max-width:650px;
 padding:20px;
 }
 
-.badge{
-color:gold;
-font-weight:bold;
+.stat{
+position:fixed;
+top:10px;
+left:10px;
+font-size:14px;
+color:#aaa;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🎬 START -->
+<div class="stat" id="stats">❤️ HP: 100 | 💰 Coins: 0 | ⚔️ Level: 1</div>
+
+<!-- 🌍 START -->
 <div id="start" class="screen active">
   <div class="box">
-    <h1>💙 Jithu Hero Quest</h1>
-    <p>A legendary journey for a small hero</p>
-    <button onclick="goHub()">START</button>
+    <h1>🌍 Jithu Adventure Quest</h1>
+    <p>A dangerous journey begins...</p>
+    <button onclick="start()">START</button>
   </div>
 </div>
 
-<!-- 🌍 HUB -->
-<div id="hub" class="screen">
+<!-- 🗺️ MAP -->
+<div id="map" class="screen">
   <div class="box">
-    <h1>🌍 Hero Base</h1>
-    <p id="stats">Coins: 0 | Badge: None</p>
+    <h2>🗺️ Choose Your Path</h2>
 
-    <button onclick="level1()">🎮 Level 1</button>
-    <button onclick="showMessage()">💌 Message</button>
+    <button onclick="forest()">🌲 Forest</button>
+    <button onclick="cave()">🕳️ Cave</button>
+    <button onclick="lake()">🌊 Lake</button>
+    <button onclick="boss()">👹 Final Boss</button>
   </div>
 </div>
 
 <!-- 🎮 GAME -->
 <div id="game" class="screen">
   <div class="box">
-    <h2 id="title">Level 1</h2>
-    <p id="story">A wild monster appears in the forest!</p>
+    <h2 id="title">Area</h2>
+    <p id="story">Story</p>
 
-    <button onclick="choice(1)">⚔️ Fight</button>
-    <button onclick="choice(2)">🏃 Run</button>
+    <button onclick="fight()">⚔️ Fight</button>
+    <button onclick="run()">🏃 Run</button>
 
     <p id="result"></p>
 
-    <button onclick="goHub()">Back</button>
+    <button onclick="goMap()">⬅ Back to Map</button>
   </div>
 </div>
 
-<!-- 💌 MESSAGE -->
-<div id="message" class="screen">
+<!-- 🏆 END -->
+<div id="end" class="screen">
   <div class="box">
-    <h2>💙 Message for Jithu</h2>
-    <p>
-      Jithu,<br><br>
-      You are a HERO in your own story 💙<br>
-      Every level you pass makes you stronger.<br><br>
-      Never stop being brave 😊
-    </p>
-
-    <button onclick="goHub()">Back</button>
+    <h1>🏆 ADVENTURE COMPLETE</h1>
+    <p id="final"></p>
+    <button onclick="restart()">Play Again</button>
   </div>
 </div>
 
 <script>
 
+let hp = 100;
 let coins = 0;
-let badge = "None";
+let level = 1;
+let currentArea = "";
 
-/* SCREEN SWITCH */
+/* SCREEN CONTROL */
 function show(id){
 document.querySelectorAll(".screen").forEach(s=>{
 s.classList.remove("active");
@@ -110,49 +113,93 @@ s.classList.remove("active");
 document.getElementById(id).classList.add("active");
 }
 
-function goHub(){
-show("hub");
-updateStats();
+/* START */
+function start(){
+show("map");
 }
 
-function showMessage(){
-show("message");
+/* AREAS */
+function forest(){
+currentArea="Forest";
+startArea("🌲 A wild wolf appears in the forest!");
 }
 
-function level1(){
+function cave(){
+currentArea="Cave";
+startArea("🕳️ A dark monster is hiding in the cave!");
+}
+
+function lake(){
+currentArea="Lake";
+startArea("🌊 A water beast rises from the lake!");
+}
+
+function boss(){
+currentArea="Boss";
+startArea("👹 FINAL BOSS: Shadow King appears!");
+}
+
+/* START AREA */
+function startArea(text){
 show("game");
-document.getElementById("title").innerText = "Level 1";
-document.getElementById("story").innerText =
-"A wild monster appears in the forest!";
+document.getElementById("title").innerText = currentArea;
+document.getElementById("story").innerText = text;
+document.getElementById("result").innerText = "";
 }
 
-/* GAME CHOICES */
-function choice(n){
+/* FIGHT */
+function fight(){
 
-if(n===1){
+if(currentArea==="Boss"){
+hp -= 40;
+coins += 50;
+level += 2;
+endGame();
+return;
+}
+
+hp -= 20;
 coins += 10;
-badge = "Brave Fighter 🛡️";
+level++;
 
-document.getElementById("result").innerHTML =
-"🔥 You defeated the monster! +10 coins";
-}
-
-else{
-coins += 5;
-badge = "Smart Runner 🏃";
-
-document.getElementById("result").innerHTML =
-"🏃 You escaped safely! +5 coins";
-}
-
+document.getElementById("result").innerText =
+"⚔️ You fought bravely! +coins earned";
 updateStats();
-
 }
 
-/* STATS */
+/* RUN */
+function run(){
+hp -= 5;
+document.getElementById("result").innerText =
+"🏃 You escaped safely!";
+updateStats();
+}
+
+/* MAP */
+function goMap(){
+show("map");
+}
+
+/* UPDATE */
 function updateStats(){
-document.getElementById("stats").innerHTML =
-"Coins: " + coins + " | Badge: " + badge;
+document.getElementById("stats").innerText =
+`❤️ HP: ${hp} | 💰 Coins: ${coins} | ⚔️ Level: ${level}`;
+}
+
+/* END */
+function endGame(){
+show("end");
+document.getElementById("final").innerHTML =
+`Coins: ${coins}<br>Level: ${level}<br>HP: ${hp}`;
+}
+
+/* RESTART */
+function restart(){
+hp=100;
+coins=0;
+level=1;
+show("map");
+updateStats();
 }
 
 </script>
